@@ -1,0 +1,40 @@
+#include <Wire.h>
+#include <ESP32Servo.h>
+#include "RTClib.h"
+RTC_DS1307 rtc;
+Servo myservo;
+DateTime now;
+const int IRPin = 27;
+const int ServoPin = 13;
+const int buzzerPin = 4;
+void setup() {
+ myservo.attach(ServoPin);
+ pinMode(IRPin, INPUT);
+ pinMode(buzzerPin, OUTPUT);
+ Serial.begin(9600);
+ if (!rtc.begin()) {
+ Serial.println("Couldn't find RTC");
+ while (1);
+ }
+7
+}
+void loop() {
+ now=rtc.now();
+ if (now.hour() == 4 && now.minute() == 10+ && now.second() == 0) { // Set the 
+time to rotate the box
+ myservo.write(90);
+ delay(5000);
+ while (digitalRead(IRPin) == HIGH) {
+ tone(buzzerPin, 1000);
+ delay(500);
+ noTone(buzzerPin);
+ delay(500);
+ }
+ myservo.write(0);
+ delay(5000);
+ }
+ Serial.println(now.hour());
+ Serial.println(now.minute());
+ Serial.println(now.second());
+ delay(500);
+}
